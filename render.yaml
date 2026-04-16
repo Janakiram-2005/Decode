@@ -31,9 +31,8 @@ services:
         sync: false          # Set to your frontend Render URL
 
   # ─── Frontend (React + Vite) ──────────────────────────────────────────────
-  - type: web
+  - type: static
     name: ml-decode-frontend
-    runtime: node
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
