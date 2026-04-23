@@ -61,8 +61,20 @@ async def upload_workspace_doc(
     save_path = os.path.join(WORKSPACE_DIR, unique_filename)
 
     try:
+        file_size_counter = 0
         with open(save_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            while True:
+                chunk = await file.read(1024 * 64)
+                if not chunk:
+                    break
+                file_size_counter += len(chunk)
+                if file_size_counter > MAX_FILE_SIZE:
+                    buffer.close()
+                    os.remove(save_path)
+                    raise HTTPException(status_code=413, detail="File too large. Max 20MB.")
+                buffer.write(chunk)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Could not save workspace file: {str(e)}")
 

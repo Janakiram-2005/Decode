@@ -52,9 +52,19 @@ async def upload_media(
         save_path = os.path.join(UPLOAD_DIR_TEXTS, unique_filename)
     
     try:
-        # Save raw file first
+        # Save file with size limit enforcement during stream
+        file_size_counter = 0
         with open(save_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            while True:
+                chunk = await file.read(1024 * 64) # 64KB chunks
+                if not chunk:
+                    break
+                file_size_counter += len(chunk)
+                if file_size_counter > MAX_FILE_SIZE:
+                    buffer.close()
+                    os.remove(save_path)
+                    raise HTTPException(status_code=413, detail="File too large. Max 10MB.")
+                buffer.write(chunk)
             
         # Hash the raw file BEFORE watermarking — used to match the original during verification
         original_sha256 = generate_sha256(save_path)
@@ -80,14 +90,13 @@ async def upload_media(
             print(f"[upload] WARNING: Watermarking FAILED: {e}")
             _tb.print_exc()
             
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Could not save file locally: {str(e)}")
         
-    # Check size
+    # File size already validated during stream
     file_size = os.path.getsize(save_path)
-    if file_size > MAX_FILE_SIZE:
-        os.remove(save_path)
-        raise HTTPException(status_code=400, detail="File too large. Max 10MB")
     
     # Generate Hash of WATERMARKED file (for exact watermarked-copy matching)
     sha256_hash = generate_sha256(save_path)
@@ -176,9 +185,13 @@ async def download_media(media_id: str, current_user: dict = Depends(get_current
     """Download the watermarked file for a given media_id (owner only)."""
     from fastapi.responses import FileResponse
     db = get_database()
-    media = await db.media.find_one({"media_id": media_id, "user_id": current_user["user_id"]})
+    media = await db.media.find_one({"media_id": media_id})
     if not media:
-        raise HTTPException(status_code=404, detail="File not found or access denied.")
+        raise HTTPException(status_code=404, detail="File not found.")
+    
+    # Allow if owner OR if current user is admin
+    if media["user_id"] != current_user["user_id"] and current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Access denied.")
     
     file_path = media.get("file_path")
     if not file_path or not os.path.exists(file_path):

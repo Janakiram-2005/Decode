@@ -102,10 +102,10 @@ def _heuristic_tamper_score(image_path: str) -> float:
         elif brightness_var > 8000:       # extremely noisy
             variance_score = 0.5
 
-        # Weighted combination
+        # Weighted combination - adjusted for better sensitivity
         heuristic_prob = (
-            chroma_score   * 0.35 +
-            edge_score     * 0.45 +
+            chroma_score   * 0.40 +
+            edge_score     * 0.40 +
             variance_score * 0.20
         )
         return round(min(heuristic_prob, 1.0), 4)

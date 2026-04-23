@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
     yield
     await close_mongo_connection()  # shutdown
 
-app = FastAPI(title="Traceable Media Verification System", lifespan=lifespan)
+app = FastAPI(title="Traceable Media Checker", lifespan=lifespan)
 
 # ── CORS – set FRONTEND_ORIGIN env var on Render ─────────────────────────────
 _origin_env = os.getenv("FRONTEND_ORIGIN", "")
@@ -53,6 +53,8 @@ async def root():
     return {"message": "Traceable Media Verification System API"}
 
 # ── Local dev ─────────────────────────────────────────────────────────────────
+# Open a terminal in the root ML-Decode directory:
 # cd backend
+# python -m venv venv
 # venv\Scripts\activate
 # uvicorn app.main:app --reload
