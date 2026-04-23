@@ -195,7 +195,12 @@ async def download_media(media_id: str, current_user: dict = Depends(get_current
     
     file_path = media.get("file_path")
     if not file_path or not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="File not available on server.")
+        # Fallback to Cloudinary URL if local file is missing
+        c_url = media.get("cloudinary_url")
+        if c_url:
+            from fastapi.responses import RedirectResponse
+            return RedirectResponse(url=c_url)
+        raise HTTPException(status_code=404, detail="File content not found on server or Cloudinary.")
     
     filename = os.path.basename(file_path)
     return FileResponse(

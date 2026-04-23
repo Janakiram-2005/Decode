@@ -50,6 +50,7 @@ const Login = () => {
                             <input
                                 type="email"
                                 required
+                                autocomplete="email"
                                 className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 outline-none transition-all dark:text-white"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -61,6 +62,7 @@ const Login = () => {
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     required
+                                    autocomplete="current-password"
                                     className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 outline-none transition-all dark:text-white pr-10"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
