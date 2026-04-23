@@ -1,21 +1,35 @@
-# ─── Python / Backend ─────────────────────────────────────────────────────────
+# Python / Backend
 backend/venv/
 backend/__pycache__/
 backend/**/__pycache__/
 backend/**/*.pyc
 backend/uploads/
-backend/app/ml/model.pth       # trained model – add separately
-backend/.env                   # NEVER commit real secrets
+backend/app/ml/model.pth
+backend/.env
 
-# ─── Node / Frontend ──────────────────────────────────────────────────────────
+# Node / Frontend
 frontend/node_modules/
 frontend/dist/
 frontend/.env
 frontend/.env.local
 
-# ─── OS / IDE ─────────────────────────────────────────────────────────────────
+# OS / IDE
 .DS_Store
 Thumbs.db
 *.swp
 .vscode/
 .idea/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
